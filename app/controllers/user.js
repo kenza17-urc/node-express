@@ -16,6 +16,34 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.login = (req, res) => {
-  res.send("You are login");
-};
+exports.login = async (req, res) => {
+    try {
+      const user = await User.findOne({
+        where: { email: req.body.email },
+      });
+  
+      if (!user) {
+        return res.status(404).json({
+          error: "Utilisateur non trouvé",
+        });
+      }
+  
+      const match = await bcrypt.compare(req.body.password, user.password);
+  
+      if (match) {
+        const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
+          expiresIn: process.env.JWTExpiration,
+        });
+  
+        res.status(200).json({
+          accessToken: token,
+          user: user,
+        });
+      }
+    } catch (err) {
+      res.status(500).json({
+        message: err.message || "Une erreur s'est produite lors de l'authentification",
+      });
+    }
+  };
+  
