@@ -31,18 +31,19 @@ exports.login = async (req, res) => {
   
       const match = await bcrypt.compare(req.body.password, user.password);
   
-      if (match) {
-        const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
-          expiresIn: process.env.JWTExpiration,
-        });
+     
+        
       if (!match) {
             return res.status(401).json({ error: "Mot de passe incorrect" });
         }
+        const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
+          expiresIn:Number(process.env.JWTExpiration),
+        });
         res.status(200).json({
           accessToken: token,
           user: user,
         });
-      }
+      
     } catch (err) {
       res.status(500).json({
         message: err.message || "Une erreur s'est produite lors de l'authentification",
