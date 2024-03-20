@@ -50,6 +50,7 @@ module.exports = (sequelize, DataTypes) => {
         notNull: { msg: "L'image est requise" },
       }
     }
+    
   }, {
     sequelize,
     modelName: 'Wood',
