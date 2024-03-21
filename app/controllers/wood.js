@@ -1,10 +1,17 @@
 const { Wood } = require("../models");
 const fs = require('fs');
+const { woodHateoas, woodCollectionHateoas } = require("../helpers/hateoas.js");
 
 exports.readAll = async (req, res) => {
     try {
-        const woods = await Wood.findAll();
-        res.status(200).json(woods);
+        let woods = await Wood.findAll();
+        woods = woods.map((wood) => {
+          return {
+            ...wood.toJSON(),
+            links: woodHateoas(wood),
+          };
+        });
+        res.status(200).json({woods, links: woodCollectionHateoas()});
     } catch (error) {
         res.status(500).json({
             message: error.message || "Une erreur s'est produite lors de la récupération des essences de bois.",
@@ -15,12 +22,20 @@ exports.readAll = async (req, res) => {
 exports.readHardness = async (req, res) => {
     try {
         const hardness = req.params.hardness;
-        const woods = await Wood.findAll({
-            where: {
-                hardness: hardness
-            }
+        let woods = await Wood.findAll({
+          where: {
+            hardness: hardness,
+          },
         });
-        res.status(200).json(woods);
+    
+        woods = woods.map((wood) => {
+          return {
+            ...wood.toJSON(),
+            links: woodHateoas(wood),
+          };
+        });
+    
+        res.status(200).json({woods, links: woodCollectionHateoas()});
     } catch (error) {
         res.status(500).json({
             message: error.message || "Une erreur s'est produite lors de la récupération des essences de bois.",
@@ -31,11 +46,14 @@ exports.readHardness = async (req, res) => {
 exports.createWood = async (req, res) => {
     try {
         const imagePath = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
-        const wood = await Wood.create({
+        let wood = await Wood.create({
             ...JSON.parse(req.body.datas),
             image: imagePath
         });
-        res.status(201).json(wood);
+
+        wood.links = woodHateoas(wood);
+
+        res.status(201).json({ wood, links: woodCollectionHateoas() });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Une erreur s'est produite lors de la création de la nouvelle essence de bois" });
@@ -71,6 +89,9 @@ exports.createWood = async (req, res) => {
                 }
         
                 await wood.update(updatedData);
+
+                wood.links = woodHateoas(wood);
+
                 res.status(200).json(wood);
             } catch (error) {
                 res.status(500).json({ message: "Une erreur s'est produite lors de la mise à jour du Wood" });
@@ -99,10 +120,13 @@ exports.createWood = async (req, res) => {
                     });
                 }
                 await wood.destroy();
-        
+                
+                wood.links = woodHateoas(wood);
+                
                 res.status(204).send();
             } catch (error) {
                 res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du Wood" });
             }
         };
+        
         
