@@ -57,10 +57,14 @@ exports.updateWood = async (req, res) => {
         await wood.update(updatedData);
 
         if (req.file) {
-        
+
             wood.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
         }
+        
+        await wood.save();
+
         res.status(200).json(wood);
+
     } catch (error) {
         res.status(500).json({ message: "Une erreur s'est produite lors de la mise à jour du Wood" });
     }
