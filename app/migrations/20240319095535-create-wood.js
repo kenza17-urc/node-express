@@ -12,31 +12,12 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
         allowNull: false,
-            validate: {
-              notNull: { msg: "Le nom est requis" },
-            },
       },
       type: {
-        type: Sequelize.ENUM('softwood', 'exotic wood', 'noble and hardwoods'),
-        allowNull: false,
-        validate: {
-          notNull: { msg: "Le type est requis" },
-          isIn: {
-            args: [['softwood', 'exotic wood', 'noble and hardwoods']],
-            msg: "Type invalide"
-          }
-        },
+        type: Sequelize.ENUM("softwood", "exotic wood", "noble and hardwoods")
       },
       hardness: {
-        type: Sequelize.ENUM('tender', 'medium-hard', 'hard'),
-        allowNull: false,
-        validate: {
-          notNull: { msg: "La dureté est requise" },
-          isIn: {
-            args: [['tender', 'medium-hard', 'hard']],
-            msg: "Dureté invalide"
-          }
-        },
+        type: Sequelize.ENUM("tender", "medium-hard", "hard")
       },
       createdAt: {
         allowNull: false,
