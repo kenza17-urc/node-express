@@ -8,6 +8,6 @@ const woodCtrl = require("../controllers/wood.js");
 router.get("/", auth,woodCtrl.readAll);
 router.get("/hardness/:hardness",auth, woodCtrl.readAll);
 router.post("/",auth, multer,woodCtrl.createWood);
-router.put("/:id", auth, woodCtrl.updateWood);
+router.put("/:id", auth,multer, woodCtrl.updateWood);
 
 module.exports = router;
