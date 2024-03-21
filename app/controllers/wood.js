@@ -76,4 +76,33 @@ exports.createWood = async (req, res) => {
                 res.status(500).json({ message: "Une erreur s'est produite lors de la mise à jour du Wood" });
             }
         };
+
+        exports.deleteWood = async (req, res) => {
+            try {
+    
+                const woodId = req.params.id;
+                
+                const wood = await Wood.findByPk(woodId);
+    
+                if (!wood) {
+                    return res.status(404).json({ message: "Wood non trouvé" });
+                }
+    
+                if (wood.image) {
+                    const filename = wood.image.split("/uploads/")[1];
+                    fs.unlink(`uploads/${filename}`, (err) => {
+                        if (err) {
+                            console.error(`Erreur lors de la suppression de l'image ${filename} :`, err);
+                        } else {
+                            console.log(`Image ${filename} supprimée avec succès`);
+                        }
+                    });
+                }
+                await wood.destroy();
+        
+                res.status(204).send();
+            } catch (error) {
+                res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du Wood" });
+            }
+        };
         
