@@ -1,4 +1,6 @@
+const { log } = require("console");
 const { Wood } = require("../models");
+const fs = require('fs');
 
 exports.readAll = async (req, res) => {
     try {
@@ -54,17 +56,30 @@ exports.updateWood = async (req, res) => {
             return res.status(404).json({ message: "Wood non trouvé" });
         }
 
+        const currentImagePath = wood.image;
+
         await wood.update(updatedData);
 
         if (req.file) {
+            const pathname = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+            wood.image = pathname;
 
-            wood.image = `${req.protocol}://${req.get("host")}/uploads/${req.file.filename}`;
+            if (currentImagePath) {
+                
+                const filename = currentImagePath.split("/uploads/")[1];
+                fs.unlink(`uploads/${filename}`, (err) => {
+                    if (err) {
+                        console.error("Erreur lors de la suppression de l'ancienne image :", err);
+                    } else {
+                        console.log(`Image ${filename} deleted`);
+                    }
+                });
+            }
         }
-        
+
         await wood.save();
 
         res.status(200).json(wood);
-
     } catch (error) {
         res.status(500).json({ message: "Une erreur s'est produite lors de la mise à jour du Wood" });
     }
